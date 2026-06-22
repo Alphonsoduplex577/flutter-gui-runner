@@ -1,14 +1,24 @@
 <div align="center">
 
-<img src="assets/logo-256.png" width="128" height="128" alt="Flutter GUI Runner logo" />
+<img src="assets/logo-256.png" width="120" height="120" alt="Flutter GUI Runner logo" />
 
 # Flutter GUI Runner
 
-**A native macOS control panel for Flutter — for developers (and AI agents) who code in editors without a Flutter plugin.**
+### The Flutter run / build / device panel for editors that don't have one.
 
-[![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-blue)]()
-[![Built with](https://img.shields.io/badge/built%20with-SwiftUI-orange)]()
-[![License](https://img.shields.io/badge/license-MIT-green)]()
+For developers — and **AI coding agents** — who live in Zed, Neovim, Helix,
+Sublime, or a plain terminal.
+
+[![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-000?logo=apple)](https://github.com/huseyiniriss/flutter-gui-runner/releases)
+[![Built with SwiftUI](https://img.shields.io/badge/SwiftUI-native-orange?logo=swift)]()
+[![License: MIT](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
+[![Download](https://img.shields.io/github/v/release/huseyiniriss/flutter-gui-runner?label=download&color=2563EB)](https://github.com/huseyiniriss/flutter-gui-runner/releases/latest)
+
+<br/>
+
+<img src="assets/screenshots/menubar.png" width="380" alt="Menu-bar quick panel" />
+
+*Always-on menu-bar panel — pick a device, Run, Hot reload, Build, all without leaving your editor.*
 
 </div>
 
@@ -16,82 +26,101 @@
 
 ## Why this exists
 
-If you write Flutter in **Zed, Neovim, Helix, Sublime, or a plain terminal**, you
-get great LSP autocomplete — but none of the run/device/build UI that Android
-Studio and VS Code bake in. You're stuck memorizing `flutter` flags and copying
-device IDs by hand.
+If you write Flutter outside Android Studio / VS Code, you get great LSP
+autocomplete — but **none of the run/device/build UI**. You're left memorizing
+`flutter` flags and pasting device IDs by hand.
 
-This is especially painful in **agentic coding** workflows. When an AI agent
-(Claude Code, Cursor, Windsurf, Aider, …) is editing your Flutter project, *you*
-still need to drive the device side: pick a target, run, hot reload, build an
-AAB/IPA, manage signing. **Flutter GUI Runner is that side of the loop** — a
-small always-available app that does everything Android Studio's Flutter plugin
-does, next to whatever editor (or agent) you use.
+It's worse in **agentic coding**. When an agent (Claude Code, Cursor, Windsurf,
+Aider…) is editing your Flutter project, *you* still have to drive the device
+side: choose a target, run, hot reload, ship an AAB/IPA, manage signing. Editors
+like Zed can't add that UI via extensions (no toolbar buttons, no dropdowns).
 
-> Zed/editor extensions can't draw this UI (no toolbar buttons, no device
-> dropdowns). A standalone app can — so that's what this is.
+**Flutter GUI Runner is that missing half of the loop** — a small, native macOS
+app that does what the Android Studio Flutter plugin does, next to *any* editor.
+
+## Screenshots
+
+| Run | Build |
+|---|---|
+| ![Run](assets/screenshots/run.png) | ![Build](assets/screenshots/build.png) |
+| **Emulators & Simulators** | **Packages** |
+| ![Emulators](assets/screenshots/emulators.png) | ![Packages](assets/screenshots/packages.png) |
+| **Commands** | **SDK** |
+| ![Commands](assets/screenshots/commands.png) | ![SDK](assets/screenshots/sdk.png) |
+| **Doctor** | **Settings** |
+| ![Doctor](assets/screenshots/doctor.png) | ![Settings](assets/screenshots/settings.png) |
 
 ## Features
 
-- 🐦 **Menu-bar quick panel** — pick device, Run/Stop, Hot reload/restart, quick build & tools, live log. Never leave your editor.
-- 🪟 **Full window** with tabs:
-  - **Run** — device picker + debug/profile/release + hot reload/restart (reliable, via `--pid-file` + `SIGUSR1/2`)
-  - **Emulators** — list & launch Android AVDs and iOS simulators
-  - **Build** — APK / **AAB** / **IPA** / iOS / Web / macOS with flavor, build name/number, `--dart-define`, `--split-per-abi`, `--obfuscate`; prefilled from `pubspec.yaml`; **reveal artifact in Finder**
-  - **Packages** — view `pubspec` deps, add / remove / **upgrade** a package, `pub outdated`
-  - **Commands** — `pub get/upgrade/outdated`, `analyze`, `test`, `format`, `build_runner`, `gen-l10n`, `clean`
-  - **SDK** — current Flutter/Dart version & channel, **upgrade**, switch channel
-  - **Doctor** — `flutter doctor -v`
-  - **Settings** — Flutter path override, projects scan root, **FVM** toggle, UI size
-- 🔐 **Android signing** — choose/generate a keystore (`keytool`), view it, write `android/key.properties`
-- 📺 **Resizable terminal** — drag the divider; font scales with the UI; everything **persists per project** across restarts
-- ⚙️ **FVM-aware** — uses `fvm flutter` automatically when a project pins a version
-- 🧩 **Editor-agnostic & zero lock-in** — runs the exact same `flutter` commands a terminal would (login shell), so behavior matches your CLI
+- 🐦 **Menu-bar quick panel** — device picker, Run/Stop, Hot reload/restart, quick Build & Tools, live log. Never leave your editor.
+- ▶️ **Run** — any device, **debug / profile / release**, hot reload & restart (reliable via `--pid-file` + `SIGUSR1/2`, no TTY needed).
+- 📱 **Emulators** — list & launch Android AVDs and iOS simulators.
+- 🔨 **Build** — APK / **AAB** / **IPA** / iOS / Web / macOS with flavor, build name/number, `--dart-define`, `--split-per-abi`, `--obfuscate`; **prefilled from `pubspec.yaml`**; reveal artifact in Finder.
+- 🔐 **Android signing** — choose or **generate a keystore** (`keytool`) and write `android/key.properties`.
+- 🧊 **Packages** — read `pubspec` deps, **add / remove / upgrade** a package, `pub outdated`.
+- ⌨️ **Commands** — `pub get/upgrade/outdated`, `analyze`, `test`, `format`, `build_runner`, `gen-l10n`, `clean`.
+- 📦 **SDK** — current Flutter/Dart version & channel, upgrade, switch channel; **Doctor** tab for `flutter doctor -v`.
+- 📺 **Resizable terminal** — drag to size, font scales with the UI; UI zoom with `⌘ +/−`.
+- ⚙️ **FVM-aware** & **per-project memory** — uses `fvm flutter` when pinned; remembers device/mode/build options across restarts.
+- 🧩 **Zero lock-in** — runs the exact `flutter` commands a terminal would (login shell), so behavior matches your CLI. No telemetry.
+
+## How it compares
+
+|  | Flutter GUI Runner | Android Studio / VS Code | Raw `flutter` CLI |
+|---|:---:|:---:|:---:|
+| Works alongside any editor / AI agent | ✅ | ❌ (IDE-bound) | ✅ |
+| Clickable device picker & run/hot-reload | ✅ | ✅ | ❌ |
+| One-click AAB/IPA + signing | ✅ | ✅ | ❌ (flags) |
+| Lightweight (native, ~1 MB) | ✅ | ❌ (heavy) | ✅ |
+| Always-on menu bar | ✅ | ❌ | ❌ |
 
 ## Install
 
-> ⚠️ The app is **not notarized yet** (open-source, unsigned builds). macOS
-> Gatekeeper will warn on first launch.
+> ⚠️ Not notarized yet (open-source, unsigned). Gatekeeper warns on first launch.
 
-1. Download `FlutterGUIRunner.dmg` from [Releases](../../releases).
-2. Drag **Flutter Runner** into `Applications`.
-3. First launch: **right-click the app → Open → Open** (only needed once).
+1. Download `FlutterGUIRunner.dmg` from [**Releases**](https://github.com/huseyiniriss/flutter-gui-runner/releases/latest).
+2. Drag **Flutter Runner** to `Applications`.
+3. First launch only: **right-click → Open → Open**.
 
-Requires a working **Flutter SDK** on your `PATH` (or set the path in Settings).
+Needs a working **Flutter SDK** on `PATH` (or set it in Settings).
+
+## Quick start
+
+1. Pick your project (auto-discovered under `~/Documents/projects`, or add a folder).
+2. Choose a device → **Run**. Save a file in your editor, hit **Hot reload**.
+3. Need a release? **Build → AAB/IPA**. Need a keystore? **Build → Android Signing → Generate**.
+4. Keep the menu-bar 🐦 panel open while you (or your agent) code.
 
 ## Build from source
 
 ```sh
 git clone https://github.com/huseyiniriss/flutter-gui-runner.git
 cd flutter-gui-runner
-./build-app.sh          # builds FlutterRunner.app
+./build-app.sh             # → FlutterRunner.app
 open ./FlutterRunner.app
-# package a DMG:
-./scripts/make-dmg.sh
+./scripts/make-dmg.sh      # → dist/FlutterGUIRunner.dmg
 ```
 
-Needs Swift 6 (Xcode 16+). No third-party dependencies.
+Swift 6 (Xcode 16+). No third-party dependencies.
 
 ## How it works
 
-- Every command runs through a **login `zsh -lc`** in the project directory, so
-  `PATH` and the iOS/Android toolchains resolve exactly like your terminal.
-- `flutter run` is launched with `--pid-file`; **hot reload/restart** are sent as
-  `SIGUSR1` / `SIGUSR2` — reliable without a TTY.
-- Log output is **coalesced and rendered in an `NSTextView`** so a chatty
+- Commands run through a **login `zsh -lc`** in the project dir → `PATH` and the
+  iOS/Android toolchains resolve exactly like your terminal.
+- `flutter run` uses `--pid-file`; **hot reload/restart** are `SIGUSR1`/`SIGUSR2`.
+- Log output is coalesced and rendered in an `NSTextView`, so a chatty
   `flutter run` stays smooth.
-- No telemetry. No network calls except what `flutter` itself does.
 
 ## Roadmap
 
-See [`docs/plans`](docs/plans). Next up: Developer-ID signing + notarization,
-deeper iOS signing, multi-device run, auto-update.
+See [`docs/plans`](docs/plans). Next: Developer-ID signing + **notarization**,
+deeper iOS signing, multi-device run, auto-update, GitHub Actions release.
 
 ## Contributing
 
-Issues and PRs welcome — this is an open-source project. Good first areas:
-notarization/CI, iOS signing, Linux/Windows port (the GUI is macOS/SwiftUI today).
+Issues and PRs welcome. Good first areas: notarization/CI, iOS signing,
+a Linux/Windows port (the UI is macOS/SwiftUI today).
 
 ## License
 
-[MIT](LICENSE) © huseyiniriss
+[MIT](LICENSE) © huseyiniriss · Built with help from Claude.

@@ -8,7 +8,7 @@ guard let infos = CGWindowListCopyWindowInfo(opts, kCGNullWindowID) as? [[String
 }
 var best: (id: Int, area: CGFloat) = (0, 0)
 for w in infos {
-    guard let owner = w[kCGWindowOwnerName as String] as? String, owner == "FlutterRunner",
+    guard let owner = w[kCGWindowOwnerName as String] as? String, owner.contains("Flutter"),
           let layer = w[kCGWindowLayer as String] as? Int, layer == 0,
           let b = w[kCGWindowBounds as String] as? [String: CGFloat],
           let id = w[kCGWindowNumber as String] as? Int else { continue }
