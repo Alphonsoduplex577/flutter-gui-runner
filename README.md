@@ -62,7 +62,7 @@ Requires a working **Flutter SDK** on your `PATH` (or set the path in Settings).
 ## Build from source
 
 ```sh
-git clone https://github.com/<owner>/flutter-gui-runner.git
+git clone https://github.com/huseyiniriss/flutter-gui-runner.git
 cd flutter-gui-runner
 ./build-app.sh          # builds FlutterRunner.app
 open ./FlutterRunner.app
