@@ -187,9 +187,15 @@ struct SettingsView: View {
                     .font(.caption2).foregroundStyle(.secondary)
             }
             Card(title: "Flutter SDK") {
-                TextField("Flutter path override (blank = use PATH)",
-                          text: $model.flutterPathOverride)
-                    .textFieldStyle(.roundedBorder)
+                HStack(spacing: Theme.s2) {
+                    TextField("Flutter path override (blank = use PATH)",
+                              text: $model.flutterPathOverride)
+                        .textFieldStyle(.roundedBorder)
+                    Button("Choose…") { model.chooseFlutterPath() }.buttonStyle(.secondary)
+                }
+                Text("Point to the Flutter SDK folder, its bin/ folder, or the flutter binary — all work.")
+                    .font(.caption2).foregroundStyle(.secondary)
+                flutterPathStatus
                 Toggle("Use FVM when project has .fvmrc / .fvm", isOn: $model.useFvm)
                 if model.fvmActive {
                     Label("FVM active for this project", systemImage: "checkmark.seal")
@@ -208,6 +214,22 @@ struct SettingsView: View {
             Button("Re-check Flutter") { Task { await model.checkFlutter() } }
                 .buttonStyle(.secondary)
             Spacer()
+        }
+    }
+
+    /// Live validation of the SDK override path.
+    @ViewBuilder private var flutterPathStatus: some View {
+        let raw = model.flutterPathOverride.trimmingCharacters(in: .whitespaces)
+        if !raw.isEmpty {
+            if let bin = AppModel.resolveFlutterBinary(raw),
+               FileManager.default.isExecutableFile(atPath: bin) {
+                Label("Using \(bin)", systemImage: "checkmark.circle.fill")
+                    .font(.caption).foregroundStyle(.green)
+            } else {
+                Label("No flutter binary found there — falling back to PATH.",
+                      systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption).foregroundStyle(.orange)
+            }
         }
     }
 }

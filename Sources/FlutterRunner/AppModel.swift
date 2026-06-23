@@ -562,6 +562,20 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Pick the Flutter SDK folder (or binary) via a file panel.
+    func chooseFlutterPath() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.prompt = "Use"
+        panel.message = "Select the Flutter SDK folder, its bin/ folder, or the flutter binary"
+        if panel.runModal() == .OK, let url = panel.url {
+            flutterPathOverride = url.path
+            Task { await checkFlutter() }
+        }
+    }
+
     func chooseKeystore() {
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
@@ -647,10 +661,34 @@ final class AppModel: ObservableObject {
     /// The flutter command prefix: explicit override path, `fvm flutter`, or
     /// bare `flutter` resolved via the login shell PATH.
     private var flutterInvocation: String {
-        if !flutterPathOverride.trimmingCharacters(in: .whitespaces).isEmpty {
-            return shellQuote(flutterPathOverride)
+        let override = flutterPathOverride.trimmed
+        if !override.isEmpty, let bin = Self.resolveFlutterBinary(override) {
+            return shellQuote(bin)
         }
         return fvmActive ? "fvm flutter" : "flutter"
+    }
+
+    /// Turn whatever the user typed in Settings into a runnable `flutter` binary:
+    /// accepts the SDK root, its `bin/` dir, or the binary itself. Falls back to
+    /// the raw (tilde-expanded) path so a custom wrapper still works.
+    static func resolveFlutterBinary(_ raw: String) -> String? {
+        let fm = FileManager.default
+        var path = (raw as NSString).expandingTildeInPath
+        while path.count > 1 && path.hasSuffix("/") { path.removeLast() }
+        guard !path.isEmpty else { return nil }
+
+        var isDir: ObjCBool = false
+        guard fm.fileExists(atPath: path, isDirectory: &isDir) else {
+            return path   // doesn't exist yet — let the shell report a clear error
+        }
+        if isDir.boolValue {
+            // SDK root → bin/flutter ; or they pointed at the bin dir → flutter
+            for candidate in ["\(path)/bin/flutter", "\(path)/flutter"] {
+                if fm.isExecutableFile(atPath: candidate) { return candidate }
+            }
+            return nil    // a directory with no flutter inside → fall back to PATH
+        }
+        return path       // a file (the binary or a wrapper script)
     }
 
     /// Builds a Process that runs flutter inside a login zsh so PATH and the
