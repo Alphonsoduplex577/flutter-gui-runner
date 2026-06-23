@@ -162,6 +162,83 @@ struct DependenciesView: View {
     }
 }
 
+// MARK: - Git
+
+struct GitView: View {
+    @EnvironmentObject var model: AppModel
+    @State private var commitMessage = ""
+
+    var body: some View {
+        TabScaffold(title: "Git", icon: "arrow.triangle.branch") {
+            if model.isGitRepo {
+                Button { model.reloadGit() } label: { Image(systemName: "arrow.clockwise") }
+                    .buttonStyle(.icon)
+            }
+        } content: {
+            if !model.isGitRepo {
+                EmptyState(title: "Not a git repository", symbol: "arrow.triangle.branch",
+                           hint: "This project isn't under git, or git isn't installed.")
+            } else {
+                Card(title: "Branch") {
+                    HStack(spacing: Theme.s2) {
+                        Image(systemName: "arrow.triangle.branch").foregroundStyle(.tint)
+                        Picker("", selection: Binding(
+                            get: { model.currentBranch },
+                            set: { model.checkoutBranch($0) })) {
+                            ForEach(model.gitBranches, id: \.self) { Text($0).tag($0) }
+                        }
+                        .labelsHidden()
+                        .disabled(model.isBusy || model.isRunning)
+                    }
+                    Text("Current: \(model.currentBranch.isEmpty ? "—" : model.currentBranch)")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+
+                Card(title: "Actions") {
+                    let cols = [GridItem(.adaptive(minimum: 130), spacing: Theme.s2)]
+                    LazyVGrid(columns: cols, alignment: .leading, spacing: Theme.s2) {
+                        gitButton("Status", "status")
+                        gitButton("Pull", "pull")
+                        gitButton("Push", "push")
+                        gitButton("Fetch", "fetch --all --prune")
+                        gitButton("Log", "log --oneline -20")
+                        gitButton("Diff", "diff --stat")
+                    }
+                }
+
+                Card(title: "Commit") {
+                    HStack(spacing: Theme.s2) {
+                        TextField("commit message", text: $commitMessage)
+                            .textFieldStyle(.roundedBorder)
+                            .onSubmit { commit() }
+                        Button("Commit all") { commit() }
+                            .buttonStyle(.primary)
+                            .disabled(commitMessage.trimmed.isEmpty || model.isBusy || model.isRunning)
+                    }
+                    Text("Runs git add -A && git commit -m …")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private func gitButton(_ title: String, _ cmd: String) -> some View {
+        Button { model.git(cmd, label: "git \(title.lowercased())") } label: {
+            Text(title).frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.secondary)
+        .disabled(model.isBusy || model.isRunning)
+    }
+
+    private func commit() {
+        let msg = commitMessage.trimmed
+        guard !msg.isEmpty else { return }
+        let escaped = msg.replacingOccurrences(of: "'", with: "'\\''")
+        model.git("add -A && git commit -m '\(escaped)'", label: "commit")
+        commitMessage = ""
+    }
+}
+
 // MARK: - Settings
 
 struct SettingsView: View {

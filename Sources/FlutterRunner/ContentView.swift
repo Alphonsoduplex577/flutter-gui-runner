@@ -36,6 +36,28 @@ private struct ModeRow: View {
     }
 }
 
+/// Entry-point (target) picker — defaults to lib/main.dart, lists lib/main*.dart.
+struct EntryRow: View {
+    @EnvironmentObject var model: AppModel
+    var body: some View {
+        HStack(spacing: Theme.s2) {
+            Image(systemName: "doc.text").foregroundStyle(.tint).frame(width: 18)
+            Picker("", selection: targetBinding) {
+                ForEach(model.entryPoints, id: \.self) { Text($0).tag($0) }
+            }
+            .labelsHidden()
+            Button { model.scanEntryPoints() } label: { Image(systemName: "arrow.clockwise") }
+                .buttonStyle(.icon).help("Rescan entry points")
+        }
+    }
+    private var targetBinding: Binding<String> {
+        Binding(
+            get: { model.target.isEmpty ? "lib/main.dart" : model.target },
+            set: { model.target = $0 }
+        )
+    }
+}
+
 private struct RunControls: View {
     @EnvironmentObject var model: AppModel
     var body: some View {
@@ -85,6 +107,10 @@ struct RunView: View {
         TabScaffold(title: "Run", icon: "play.fill") {
             DeviceRow().frame(maxWidth: 280)
         } content: {
+            HStack(spacing: Theme.s2) {
+                Text("Entry").font(.caption).foregroundStyle(.secondary)
+                EntryRow()
+            }
             ModeRow()
             RunControls()
             if model.isRunning { HotControls() }

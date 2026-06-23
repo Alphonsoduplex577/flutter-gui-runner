@@ -15,11 +15,13 @@ final class AppModel: ObservableObject {
             loadProjectSettings()
             loadDependencies()
             readPubspecMeta()
+            scanEntryPoints()
             Task {
                 isScanning = true
                 await refreshDevices()
                 await refreshEmulators()
                 await refreshVersion()
+                await refreshGit()
                 isScanning = false
             }
         }
@@ -55,6 +57,12 @@ final class AppModel: ObservableObject {
 
     // Dependencies (Phase 06)
     @Published var dependencies: [Dependency] = []
+
+    // Entry points (lib/main*.dart) + git
+    @Published var entryPoints: [String] = ["lib/main.dart"]
+    @Published var isGitRepo = false
+    @Published var gitBranches: [String] = []
+    @Published var currentBranch: String = ""
 
     /// Persisted per-project state (build options, signing, device, mode).
     private struct ProjectSettings: Codable {
@@ -231,6 +239,62 @@ final class AppModel: ObservableObject {
         }
     }
 
+    // MARK: - Entry points (lib/main*.dart)
+
+    /// Find candidate entry files under lib/ so the user can pick dev/prod mains.
+    func scanEntryPoints() {
+        var found: Set<String> = ["lib/main.dart"]
+        guard let project = selectedProject else { entryPoints = ["lib/main.dart"]; return }
+        let lib = project.appendingPathComponent("lib")
+        let fm = FileManager.default
+        if let en = fm.enumerator(at: lib, includingPropertiesForKeys: nil) {
+            for case let url as URL in en {
+                let name = url.lastPathComponent
+                // main.dart, main_dev.dart, main_prod.dart, app_main.dart, …
+                if name.hasSuffix(".dart"), name.contains("main") {
+                    let rel = url.path.replacingOccurrences(of: project.path + "/", with: "")
+                    found.insert(rel)
+                }
+            }
+        }
+        entryPoints = found.sorted()
+        // keep the saved target if still valid, else default
+        if target.trimmed.isEmpty || !entryPoints.contains(target) {
+            if !entryPoints.contains(target.trimmed) { target = "lib/main.dart" }
+        }
+    }
+
+    // MARK: - Git
+
+    func refreshGit() async {
+        guard let project = selectedProject else { isGitRepo = false; return }
+        let inside = await shellCapture("git rev-parse --is-inside-work-tree 2>/dev/null",
+                                        project: project)
+        isGitRepo = (inside.trimmed == "true")
+        guard isGitRepo else { gitBranches = []; currentBranch = ""; return }
+        currentBranch = (await shellCapture("git branch --show-current",
+                                            project: project)).trimmed
+        let raw = await shellCapture("git branch --format='%(refname:short)'", project: project)
+        gitBranches = raw.split(separator: "\n").map { String($0).trimmed }.filter { !$0.isEmpty }
+    }
+
+    func reloadGit() { Task { await refreshGit() } }
+
+    func checkoutBranch(_ branch: String) {
+        guard !isBusy, !isRunning, branch != currentBranch else { return }
+        runShell("git checkout \(shellQuote(branch))", label: "checkout \(branch)") { [weak self] in
+            Task { await self?.refreshGit() }
+        }
+    }
+
+    /// Run a basic git command, refreshing branch state afterwards.
+    func git(_ command: String, label: String) {
+        guard !isBusy, !isRunning else { return }
+        runShell("git \(command)", label: label) { [weak self] in
+            Task { await self?.refreshGit() }
+        }
+    }
+
     // MARK: - Project discovery
 
     func discoverProjects() {
@@ -378,6 +442,9 @@ final class AppModel: ObservableObject {
         if let flag = mode.flag { args.append(flag) }
         if !flavor.trimmingCharacters(in: .whitespaces).isEmpty {
             args.append(contentsOf: ["--flavor", flavor])
+        }
+        if !target.trimmed.isEmpty, target.trimmed != "lib/main.dart" {
+            args.append(contentsOf: ["--target", target.trimmed])
         }
         // pid-file lets us signal hot reload/restart reliably (no TTY needed).
         let pidURL = FileManager.default.temporaryDirectory
@@ -628,7 +695,8 @@ final class AppModel: ObservableObject {
     }
 
     /// Run an arbitrary shell command in the project dir (e.g. keytool).
-    func runShell(_ command: String, label: String) {
+    func runShell(_ command: String, label: String,
+                  onDone: (@Sendable @MainActor () -> Void)? = nil) {
         guard let project = selectedProject, !isBusy, !isRunning else { return }
         clearLog(); isBusy = true; statusLine = "\(label)…"
         let proc = Process()
@@ -639,14 +707,32 @@ final class AppModel: ObservableObject {
                 self?.isBusy = false
                 self?.statusLine = "\(label) done"
                 self?.process = nil
+                onDone?()
             }
         }
     }
 
-    /// Captures full stdout of a short command (used for `devices --machine`).
+    /// Captures full stdout of a short flutter command (e.g. `devices --machine`).
     private func runCapture(args: [String], project: URL?) async -> String {
         await withCheckedContinuation { cont in
             let proc = makeProcess(args: args, project: project)
+            let out = Pipe()
+            proc.standardOutput = out
+            proc.standardError = Pipe()
+            proc.terminationHandler = { _ in
+                let data = out.fileHandleForReading.readDataToEndOfFile()
+                cont.resume(returning: String(data: data, encoding: .utf8) ?? "")
+            }
+            do { try proc.run() } catch { cont.resume(returning: "") }
+        }
+    }
+
+    /// Captures stdout of an arbitrary shell command (e.g. git), no flutter prefix.
+    private func shellCapture(_ command: String, project: URL) async -> String {
+        await withCheckedContinuation { cont in
+            let proc = Process()
+            proc.executableURL = URL(fileURLWithPath: "/bin/zsh")
+            proc.arguments = ["-lc", "cd \(shellQuote(project.path)) && \(command)"]
             let out = Pipe()
             proc.standardOutput = out
             proc.standardError = Pipe()

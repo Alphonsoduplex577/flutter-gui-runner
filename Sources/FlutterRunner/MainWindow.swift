@@ -15,6 +15,7 @@ struct MainWindow: View {
                 BuildView().tabItem { Label("Build", systemImage: "hammer.fill") }
                 DependenciesView().tabItem { Label("Packages", systemImage: "cube.box") }
                 CommandsView().tabItem { Label("Commands", systemImage: "terminal") }
+                GitView().tabItem { Label("Git", systemImage: "arrow.triangle.branch") }
                 SDKView().tabItem { Label("SDK", systemImage: "shippingbox") }
                 DoctorView().tabItem { Label("Doctor", systemImage: "stethoscope") }
                 SettingsView().tabItem { Label("Settings", systemImage: "gearshape") }
